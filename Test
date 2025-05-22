@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test EAMD</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 100%;
+      padding: 20px;
+      margin: 0;
+      box-sizing: border-box;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    .question {
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .question label:first-child {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .question label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .results {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      background: #e0f7fa;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        max-width: 600px;
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Escala de Depresión (EAMD)</h1>
+  <form id="eamd-form">
+    <div id="preguntas-container"></div>
+    <button type="submit">Calcular resultado</button>
+  </form>
+  <div id="resultado" class="results"></div>
+
+  <script>
+    const preguntas = [
+      "1. Me siento decaído(a) y triste.",
+      "2. Por las mañanas me siento mejor.",
+      "3. Lloro con facilidad o siento ganas de llorar.",
+      "4. Tengo problemas para dormir.",
+      "5. Como igual que antes.",
+      "6. Noto que estoy adelgazando.",
+      "7. Me cuesta ir al baño.",
+      "8. Me cuesta comenzar con mis actividades.",
+      "9. Me siento intranquilo(a) e inquieto(a).",
+      "10. Me canso con facilidad.",
+      "11. Me cuesta tomar decisiones.",
+      "12. Me siento inútil e incapaz.",
+      "13. Siento que he perdido interés por las cosas.",
+      "14. Siento que no soy bueno(a) para nada.",
+      "15. Siento que no valgo la pena.",
+      "16. Tengo pensamientos de suicidio.",
+      "17. Me siento menos atraído(a) por el sexo.",
+      "18. Me preocupo por mi salud.",
+      "19. Me siento cansado(a) o con poca energía.",
+      "20. Siento que mi vida no tiene sentido."
+    ];
+
+    const respuestas = [
+      "Muy pocas veces",
+      "Algunas veces",
+      "Muchas veces",
+      "Casi siempre"
+    ];
+
+    const container = document.getElementById("preguntas-container");
+
+    preguntas.forEach((texto, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      const labelPregunta = `<label>${texto}</label>`;
+      let radios = "";
+      respuestas.forEach((res, j) => {
+        // Para preguntas invertidas (como la 2 y 5), invierte los valores
+        const invertidas = [2, 5];
+        const valor = invertidas.includes(i + 1) ? 4 - j : j + 1;
+        radios += `
+          <label>
+            <input type="radio" name="q${i + 1}" value="${valor}" required> ${res}
+          </label>
+        `;
+      });
+      div.innerHTML = labelPregunta + radios;
+      container.appendChild(div);
+    });
+
+    document.getElementById("eamd-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      let total = 0;
+      const form = new FormData(event.target);
+      for (let value of form.values()) {
+        total += parseInt(value);
+      }
+
+      let interpretacion = "";
+      if (total <= 40) interpretacion = "No indica sintomas de depresión. No se observan síntomas clínicamente significativos. Puede haber algunas molestias emocionales leves, pero no indican un trastorno depresivo. Acciones: No se requiere intervención clínica, aunque el monitoreo puede ser útil si hay factores de riesgo. Consultanos Ahora.";
+      else if (total <= 60) interpretacion = "Posibles síntomas para depresión leve, Hay presencia de síntomas depresivos que pueden afectar el estado de ánimo y el funcionamiento general? Acciones: Se recomienda una evaluación psicológica. Puede beneficiarse de intervenciones psicológicas, terapias y programas de apoyo. Consultanos Ahora.";
+      else if (total <= 80) interpretacion = "Posibles síntomas para depresión Moderada. Siente o experimenta síntomas que probablemente interfieren con su vida diaria? Acciones: Se sugiere una evaluación clínica completa. Es necesario iniciar un tratamiento psicológico de inmediato y, en algunos casos, considerar el uso de medicación antidepresiva bajo supervisión médica. Consultanos Ahora.";
+      else interpretacion = "Indicios para depresión severa. Indica un nivel alto de depresión, siente que sufre un gran impacto en el funcionamiento personal, social o laboral? Tiene pensamientos suicidas? Acciones: Se requiere atención profesional urgente. El tratamiento intensivo puede incluir terapia psicológica estructurada, medicación, y en algunos casos hospitalización. Es fundamental evaluar tu caso lo más pronto, Consultanos Ahora.";
+
+      document.getElementById("resultado").textContent =
+        `Tu puntuación total es ${total}. Resultado: ${interpretacion}`;
+    });
+  </script>
+</body>
+</html>
